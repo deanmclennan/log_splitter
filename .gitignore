@@ -14,5 +14,10 @@
 # Dependency directories (remove the comment below to include it)
 # vendor/
 
-/bin
+./bin
 
+# igonre bin folder
+
+# ignore .env file
+
+.env
