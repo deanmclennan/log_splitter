@@ -9,13 +9,6 @@ import (
 	"regexp"
 )
 
-// Check operating system
-
-func check_os() string {
-	os := os.Getenv("OS")
-	return os
-}
-
 // remove duplicate strings from slice
 func removeDuplicates(elements []string) []string {
 	// Use map to record duplicates as we find them.
@@ -37,24 +30,15 @@ func removeDuplicates(elements []string) []string {
 }
 
 // Split process name from PID
-func split_process_name_pid(process string) (string, string) {
+func split_process_name_pid(process string) string {
 	// split string into two parts
 	r, err := regexp.Compile(`[\w-]+`)
 	if err != nil {
 		log.Fatal(err)
 	}
 	process_name := r.FindStringSubmatch(process)
-	// fmt.Println(process_name[0])
 
-	r, err = regexp.Compile(`\[\d+\]`)
-	if err != nil {
-		log.Fatal(err)
-	}
-	pid := r.FindStringSubmatch(process)
-	// fmt.Println(pid[0])
-
-	return process_name[0], pid[0]
-
+	return process_name[0]
 }
 
 // Open log file and find all process names
@@ -70,13 +54,8 @@ func find_all_process_names(logfile string) []string {
 	// make slice to hold regex matches
 	var matches []string
 
-	var pids []string
-
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
-		// print regex matches
-
-		// fmt.Println(r.FindStringSubmatch(scanner.Text()))
 
 		// put regex matches into slice of strings
 		r, err := regexp.Compile(`[\w-]+\[\d+\]:`)
@@ -86,8 +65,6 @@ func find_all_process_names(logfile string) []string {
 
 		matches = append(matches, r.FindStringSubmatch(scanner.Text())...)
 
-		// remove duplicates from slice
-
 	}
 
 	// remove duplicates from slice
@@ -95,13 +72,8 @@ func find_all_process_names(logfile string) []string {
 
 	// split process name from PID
 	for i, process := range matches {
-		process_name, pid := split_process_name_pid(process)
+		process_name := split_process_name_pid(process)
 		matches[i] = process_name
-		pids = append(pids, pid)
-
-		// push process name and PID to slice
-		// process_system = append(process_system, process_name)
-
 	}
 
 	// remove duplicates from slice
@@ -162,23 +134,13 @@ func check_folder_exists(folder string) bool {
 	return true
 }
 
-// Create folder
-
-func create_folder(folder string) {
-
-	err := os.Mkdir(folder, 0755)
-	if err != nil {
-		log.Fatal(err)
-	}
-}
-
 // Make file name from process name and then write to file the lines that match the process name using sort logs by process function
 func write_to_file(process string, root_folder string, logfile string) {
 
+	// set root folder
 	folder := root_folder
 
 	// make file name from process name
-
 	file_name := process + ".log"
 
 	// write to file the lines that match the process name using sort logs by process function
@@ -214,20 +176,12 @@ func Split_logs(logfile string, root_folder string) {
 	// make root folder for process logs
 	root_name := root_folder
 	root_folder_exists := check_folder_exists(root_name)
-	if root_folder_exists == false {
+	if !root_folder_exists {
 		make_root_folder(root_name)
 	}
 
 	// find all process names
 	process_names := find_all_process_names(logfile)
-
-	// // for each process name in slice create folder
-	// for _, process := range process_names {
-	// 	folder_exists := check_folder_exists(root_name + "/" + process)
-	// 	if folder_exists == false {
-	// 		create_folder(root_name + "/" + process)
-	// 	}
-	// }
 
 	// for each process name in slice move logs to folder
 	for _, process := range process_names {
