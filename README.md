@@ -21,3 +21,9 @@ logsplitter -f <messages file location> -r <output folder location>
 ## License
 
 [Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0)
+
+<!-- About section on github -->
+
+## About
+
+Slice those logs up into pretty little pieces. Output each process to a separate file.
