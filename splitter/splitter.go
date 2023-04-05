@@ -1,7 +1,6 @@
 package splitter
 
 import (
-	// "bufio"
 	"bufio"
 	"fmt"
 	"log"
